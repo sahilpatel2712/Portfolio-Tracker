@@ -11,7 +11,6 @@ export default {
         textColor: {
           danger: "#DC3545",
           success: "#28A745",
-          light: "#fff",
         },
       },
     },

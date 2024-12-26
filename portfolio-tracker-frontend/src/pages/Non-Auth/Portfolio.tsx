@@ -1,5 +1,8 @@
+import { Button } from "@mui/material";
 import { SearchIcon } from "../../assets/svgs";
 import StockTable from "../../components/StockTable";
+import FormModal from "../../components/FormModal";
+import React from "react";
 
 const stockData = [
   {
@@ -55,18 +58,42 @@ const stockData = [
 ];
 
 const Portfolio = () => {
+  const [openModal, setOpenModal] = React.useState(false);
+  const handleOpenFormModal = () => {
+    setOpenModal(true);
+  };
   return (
     <div className="w-full flex flex-col">
       <p className="w-full font-medium text-xl">Holdings</p>
-      <div className="flex h-[40px] max-w-[30%] w-full px-3 py-1 gap-2 mt-5 bg-bgColor self-end rounded-md border-[0.5px] border-opacity-50 border-[#e5e7eb]">
-        <span className="flex w-5">{SearchIcon()}</span>
-        <input
-          type="text"
-          placeholder="Stocks"
-          className=" flex-grow shadow focus:outline-none focus:shadow-none focus:ring-0 text-white bg-bgColor"
-        />
+      <div className="flex  w-full   justify-between  mt-5">
+        <div className="w-full flex  gap-2 bg-bgColor px-3 py-1 h-[40px] max-w-[30%] rounded-md border-[0.5px] border-opacity-50 border-[#e5e7eb]">
+          <span className="flex w-5">{SearchIcon()}</span>
+          <input
+            type="text"
+            placeholder="Stocks"
+            className="w-full flex-grow shadow focus:outline-none focus:shadow-none focus:ring-0 text-white bg-bgColor"
+          />
+        </div>
+        <div className="flex h-[40px]">
+          <Button
+            color="inherit"
+            style={{
+              backgroundColor: "#2563eb",
+              fontSize: 12,
+              fontWeight: "600",
+            }}
+            onClick={handleOpenFormModal}
+          >
+            Add Stocks
+          </Button>
+        </div>
       </div>
-      <StockTable stocksData={stockData} classes="my-5" />
+      <StockTable
+        stocksData={stockData}
+        classes="my-5"
+        handleOpenFormModal={handleOpenFormModal}
+      />
+      <FormModal open={openModal} setOpen={setOpenModal} />
     </div>
   );
 };

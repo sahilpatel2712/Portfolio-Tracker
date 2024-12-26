@@ -12,19 +12,19 @@ const Signup = () => {
           <label className="font-semibold" htmlFor="userName">
             User Name{" "}
           </label>
-          <TextInput placeholder="Username" type="text" />
+          <TextInput placeholder="Username" type="text" classes="border-gray-600" />
         </div>
         <div className="w-[100%] mb-4 flex flex-col gap-1">
           <label className="font-semibold" htmlFor="email">
             Email{" "}
           </label>
-          <TextInput placeholder="abc123@xyz.com" type="text" />
+          <TextInput placeholder="abc123@xyz.com" type="text" classes="border-gray-600" />
         </div>
         <div className="w-[100%] mb-4 flex flex-col gap-1">
           <label className="font-semibold" htmlFor="userName">
             Password{" "}
           </label>
-          <TextInput placeholder="password" type="password" />
+          <TextInput placeholder="Password" type="password" classes="border-gray-600" />
         </div>
         <button
           type="submit"

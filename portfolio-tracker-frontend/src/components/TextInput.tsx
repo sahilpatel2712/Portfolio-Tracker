@@ -50,7 +50,7 @@ const TextInput = React.forwardRef<HTMLInputElement, InputProps>(
             value={value}
             id={name}
             type={type}
-            className={`w-full shadow border-gray-600 rounded-md px-4 py-2 focus:outline-none bg-white focus:shadow-none focus:ring-0 text-black ${
+            className={`w-full shadow rounded-md px-4 py-2 focus:outline-none focus:shadow-none focus:ring-0 text-black ${
               error ? "border-red-500" : ""
             } ${classes}`}
             required={required}
