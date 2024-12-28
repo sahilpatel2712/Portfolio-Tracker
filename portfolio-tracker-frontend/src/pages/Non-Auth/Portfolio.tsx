@@ -66,7 +66,7 @@ const Portfolio = () => {
     <div className="w-full flex flex-col">
       <p className="w-full font-medium text-xl">Holdings</p>
       <div className="flex  w-full   justify-between  mt-5">
-        <div className="w-full flex  gap-2 bg-bgColor px-3 py-1 h-[40px] max-w-[30%] rounded-md border-[0.5px] border-opacity-50 border-[#e5e7eb]">
+        <div className="w-full min-w-[160px] flex  gap-2 bg-bgColor px-3 py-1 h-[40px]  max-w-[30%] rounded-md border-[0.5px] border-opacity-50 border-[#e5e7eb]">
           <span className="flex w-5">{SearchIcon()}</span>
           <input
             type="text"
@@ -90,7 +90,7 @@ const Portfolio = () => {
       </div>
       <StockTable
         stocksData={stockData}
-        classes="my-5"
+        classes="min-[601px]:my-5 max-[600px]:border-[#fff] max-[600px]:border-opacity-20 max-[600px]:pt-4 max-[600px]:px-2  max-[600px]:border-t-[1px]"
         handleOpenFormModal={handleOpenFormModal}
       />
       <FormModal open={openModal} setOpen={setOpenModal} />

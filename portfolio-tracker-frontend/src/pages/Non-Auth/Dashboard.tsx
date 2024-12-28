@@ -8,13 +8,14 @@ const Dashboard = () => {
   const handleOpenFormModal = () => {
     setOpenModal(true);
   };
+
   return (
     <>
       <div className="w-full border-b-[0.5px] border-b-[#e5e7eb] pb-10 border-opacity-20">
         <p className="w-full font-medium text-xl">Top Performer</p>
         <StockTable
           tableType="profit"
-          classes="mt-7 mb-10"
+          classes="min-[601px]:mt-7 max-[600px]:mb-5 mb-7"
           stocksData={[
             {
               stockName: "HDFCBANK",
@@ -32,7 +33,7 @@ const Dashboard = () => {
         <p className="w-full font-medium text-xl">Least Performer</p>
         <StockTable
           tableType="loss"
-          classes="mt-7"
+          classes="min-[601px]:mt-7"
           stocksData={[
             {
               stockName: "ADANIGREEN",
