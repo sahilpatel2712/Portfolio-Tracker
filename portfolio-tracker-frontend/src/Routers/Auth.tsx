@@ -2,6 +2,7 @@ import { Navigate, Route } from "react-router";
 import Signup from "../pages/Auth/Signup";
 import Signin from "../pages/Auth/Signin";
 import AuthLayout from "../components/Layouts/AuthLayout";
+import Error404 from "../components/404";
 
 const Auth = () => {
   return (
@@ -11,6 +12,7 @@ const Auth = () => {
         <Route path="/Signup" element={<Signup />} />
         <Route path="/Signin" element={<Signin />} />
       </Route>
+      <Route path="*" element={<Error404/>} />
     </>
   );
 };

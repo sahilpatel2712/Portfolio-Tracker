@@ -1,4 +1,4 @@
-import { Button, Menu } from "@mui/material";
+import { Button, Menu, Tooltip } from "@mui/material";
 import React from "react";
 import { EditIcon, TrashIcon } from "../assets/svgs";
 import DeleteConformModal from "./DeleteConformModal";
@@ -46,6 +46,7 @@ const StockTable = ({
   const handleOpenDeleteModal = () => {
     setOpenDeleteModal(true);
   };
+  
   return (
     <>
       <div
@@ -107,8 +108,12 @@ const StockSlot = (stockProp: StockSlotType) => {
         onClick={handleClick}
         className={`w-full flex justify-between ${stockProp.classes}`}
       >
-        <div className="flex flex-col gap-1 text-left">
-          <p className="text-lg">{stockProp.stockName}</p>
+        <div className="flex flex-col gap-1 text-left max-w-[40%]">
+          <Tooltip title={stockProp.stockName}>
+            <p className="text-lg truncate">
+              {stockProp.stockName}
+            </p>
+          </Tooltip>
           <p className="font-normal text-sm">
             {stockProp.quantity} X{" "}
             <span className=" text-[#B3B3B3] mr-1">AVG</span>
@@ -193,7 +198,11 @@ const TableCP = (stockProp: StockSlotType) => {
         onClick={handleClick}
         className="flex w-full font-medium py-2 hover:bg-slate-700 cursor-pointer hover:bg-opacity-40"
       >
-        <div className="flex-1">{stockProp.stockName}</div>
+        <Tooltip title={stockProp.stockName}>
+          <div className="flex-1 max-w-[50%] truncate">
+            {stockProp.stockName}
+          </div>
+        </Tooltip>
         <div className="flex-1">{stockProp.quantity}</div>
         <div className="flex-1">{stockProp.currentPrice}</div>
         <div className="flex-1">{stockProp.averagePrice}</div>
