@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { addStocks, deleteStocks, updateStocks } from "../controller/stockController";
+import {
+  addStocks,
+  deleteStocks,
+  getStocks,
+  updateStocks,
+} from "../controller/stockController";
 
-const stockRouter=Router()
+const stockRouter = Router();
 
-stockRouter.post("/add",addStocks)
-stockRouter.post("/update/:id",updateStocks)
-stockRouter.delete("/delete/:id",deleteStocks)
+stockRouter.get("/portfolio", getStocks);
+stockRouter.post("/add", addStocks);
+stockRouter.put("/update/:id", updateStocks);
+stockRouter.delete("/delete/:id", deleteStocks);
 
-export default stockRouter
+export default stockRouter;
