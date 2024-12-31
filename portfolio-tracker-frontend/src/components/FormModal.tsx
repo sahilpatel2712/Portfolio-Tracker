@@ -77,8 +77,8 @@ const FormModal = ({ open, setOpen }: FormModalType) => {
                     label="Name"
                     placeholder="Apple Inc"
                     type="text"
-                    error={errors.name?.message}
-                    registerProps={register("name")}
+                    error={errors.stockName?.message}
+                    registerProps={register("stockName")}
                   />
                   <FormInput
                     label="Ticker"
@@ -102,8 +102,8 @@ const FormModal = ({ open, setOpen }: FormModalType) => {
                     label="Price"
                     placeholder="23.5"
                     type="number"
-                    error={errors.price?.message}
-                    registerProps={register("price", { valueAsNumber: true })}
+                    error={errors.averagePrice?.message}
+                    registerProps={register("averagePrice", { valueAsNumber: true })}
                   />
                 </div>
                 <div className="w-full flex justify-end gap-3 mt-4">
