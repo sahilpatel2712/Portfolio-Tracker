@@ -6,6 +6,7 @@ import {
   UpdateStockValueType,
 } from "../helper/zodSchema";
 import prisma from "../db";
+import { addManyStocks, calculateStocksProfit } from "../helper/stockHelper";
 
 export const getStocks = async (req: Request, res: Response) => {
   const userId = req.user?.id;
@@ -26,9 +27,13 @@ export const getStocks = async (req: Request, res: Response) => {
         investedAmount: true,
       },
     });
-    res
-      .status(201)
-      .json({ message: "Portfolio fetch successfully", portfolio: userStocks });
+    const enrichedStocks = await Promise.all(
+      userStocks.map(async (stock) => await calculateStocksProfit(stock))
+    );
+    res.status(201).json({
+      message: "Portfolio fetch successfully",
+      payload: enrichedStocks,
+    });
   } catch (error) {
     console.log("error in get stock", error);
     res.status(500).json({ message: "Internal server error" });
@@ -51,17 +56,18 @@ export const addStocks = async (req: Request, res: Response) => {
     return;
   }
   try {
-    const investedAmount = Number(body.averagePrice) * Number(body.quantity);
-    await prisma.stocks.create({
-      data: {
+    const payload = [
+      {
         stockName: body.stockName,
         ticker: body.ticker,
         quantity: body.quantity,
         averagePrice: body.averagePrice,
-        investedAmount: investedAmount,
-        userId: userId as string,
       },
-    });
+    ];
+    const addedStocks = await addManyStocks(payload, userId!);
+    if (addedStocks.count === 0) {
+      res.status(500).json({ message: "Internal server error" });
+    }
     res.status(201).json({ message: "Stock add in portfolio" });
   } catch (error) {
     console.log("error in add stock", error);

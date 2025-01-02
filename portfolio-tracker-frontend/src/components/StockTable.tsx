@@ -2,14 +2,16 @@ import { Button, Menu, Tooltip } from "@mui/material";
 import React from "react";
 import { EditIcon, TrashIcon } from "../assets/svgs";
 import DeleteConformModal from "./DeleteConformModal";
+import { isValidArray } from "../utils/objectsValidation";
 
-type StockDataType = {
+export type StockDataType = {
+  id: string;
+  ticker: string;
   stockName: string;
   quantity: number | string;
   currentPrice: number | string;
   averagePrice: number | string;
   investedAmount: number | string;
-  marketValue: number | string;
   overall: number | string;
   isProfit: boolean;
 };
@@ -46,7 +48,7 @@ const StockTable = ({
   const handleOpenDeleteModal = () => {
     setOpenDeleteModal(true);
   };
-  
+
   return (
     <>
       <div
@@ -64,25 +66,33 @@ const StockTable = ({
           <div className="flex-1 break-words">Gain/Loss</div>
           <div className="flex-1 break-words hidden lg:block"></div>
         </div>
-        {stocksData.map((stock, index) => (
-          <TableCP
-            key={index}
-            handleOpenFormModal={handleOpenFormModal}
-            handleOpenDeleteModal={handleOpenDeleteModal}
-            {...stock}
-          />
-        ))}
+        {isValidArray(stocksData) ? (
+          stocksData.map((stock, index) => (
+            <TableCP
+              key={index}
+              handleOpenFormModal={handleOpenFormModal}
+              handleOpenDeleteModal={handleOpenDeleteModal}
+              {...stock}
+            />
+          ))
+        ) : (
+          <div className="mt-10 text-xl font-medium">Stocks not found</div>
+        )}
       </div>
       <div className="w-full hidden flex-col my-5 max-[600px]:flex gap-5">
-        {stocksData.map((stock, index) => (
-          <StockSlot
-            {...stock}
-            handleOpenFormModal={handleOpenFormModal}
-            handleOpenDeleteModal={handleOpenDeleteModal}
-            classes={classes}
-            key={index}
-          />
-        ))}
+        {isValidArray(stocksData) ? (
+          stocksData.map((stock, index) => (
+            <StockSlot
+              {...stock}
+              handleOpenFormModal={handleOpenFormModal}
+              handleOpenDeleteModal={handleOpenDeleteModal}
+              classes={classes}
+              key={index}
+            />
+          ))
+        ) : (
+          <div className="mt-10 text-xl font-medium text-center">Stocks not found</div>
+        )}
       </div>
       <DeleteConformModal open={openDeleteModal} setOpen={setOpenDeleteModal} />
     </>
@@ -110,9 +120,7 @@ const StockSlot = (stockProp: StockSlotType) => {
       >
         <div className="flex flex-col gap-1 text-left max-w-[40%]">
           <Tooltip title={stockProp.stockName}>
-            <p className="text-lg truncate">
-              {stockProp.stockName}
-            </p>
+            <p className="text-lg truncate">{stockProp.stockName}</p>
           </Tooltip>
           <p className="font-normal text-sm">
             {stockProp.quantity} X{" "}

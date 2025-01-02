@@ -1,5 +1,3 @@
-import React from "react";
-
 const Loader = () => {
   return (
     <div className="relative z-[1050] block">

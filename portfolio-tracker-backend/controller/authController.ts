@@ -8,6 +8,33 @@ import {
   SignupValuesType,
 } from "../helper/zodSchema";
 import prisma from "../db";
+import { addRandomStocks } from "../helper/stockHelper";
+
+export const getUserDetail = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+  try {
+    const userDetail = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        username: true,
+      },
+    });
+    if (!userDetail) {
+      res.status(401).json({ message: "User not found" });
+    }
+    res
+      .status(201)
+      .json({ message: "user detail found successfully", payload: userDetail });
+  } catch (error) {
+    console.log("error in user detail fetch", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const signupController = async (req: Request, res: Response) => {
   const body: SignupValuesType = req.body;
@@ -42,7 +69,10 @@ export const signupController = async (req: Request, res: Response) => {
       { id: savedUser.id, email: savedUser.email },
       process.env.JWT_SECRET!
     );
-    res.status(201).json({ message: "User signup successfully", token });
+    await addRandomStocks(savedUser.id);
+    res
+      .status(201)
+      .json({ message: "User signup successfully", payload: { token: token } });
     return;
   } catch (error) {
     console.log("error in signup", error);
@@ -79,7 +109,9 @@ export const signinController = async (req: Request, res: Response) => {
       { id: user.id, email: user.email },
       process.env.JWT_SECRET!
     );
-    res.status(200).json({ message: "Signin successful", token });
+    res
+      .status(200)
+      .json({ message: "Signin successful", payload: { token: token } });
   } catch (error) {
     console.log("error in signin", error);
     res.status(500).json({ message: "Internal server error" });

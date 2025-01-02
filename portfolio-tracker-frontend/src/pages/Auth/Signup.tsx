@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import TextInput from "../../components/TextInput";
 import { signupSchema, SignupValuesType } from "../../schema/authValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppDispatch } from "../../redux/hooks";
+import { userSignUp } from "../../redux/auth/authSlice";
+import { useNavigate } from "react-router";
 
 const Signup = () => {
   const {
@@ -11,9 +14,14 @@ const Signup = () => {
   } = useForm<SignupValuesType>({
     resolver: zodResolver(signupSchema),
   });
-
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const onSubmit = async (value: SignupValuesType) => {
-    console.log(value);
+    dispatch(
+      userSignUp(value, () => {
+        navigate("/dashboard");
+      })
+    );
   };
 
   return (

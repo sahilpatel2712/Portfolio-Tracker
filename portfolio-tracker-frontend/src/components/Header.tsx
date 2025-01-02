@@ -2,9 +2,14 @@ import React from "react";
 import { Avatar, Button, Menu, MenuItem } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router";
 import { LogoutIcon } from "../assets/svgs";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { userLogOut } from "../redux/auth/authSlice";
+import { stringAvatar } from "../utils/avtarUtils";
 
 const Header = () => {
   const path = useLocation();
+  const username = useAppSelector((state) => state.auth.userName);
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -16,7 +21,11 @@ const Header = () => {
   };
   const handleLogout = () => {
     handleClose();
-    navigate("/signin", { replace: true });
+    dispatch(
+      userLogOut(() => {
+        navigate("/signin", { replace: true });
+      })
+    );
   };
   return (
     <div className="bg-bgColor-custom mb-4 px-3 py-1 rounded-md max-w-[1600px] w-full">
@@ -53,7 +62,7 @@ const Header = () => {
             disableTouchRipple={true}
             disableFocusRipple={true}
           >
-            <Avatar sx={{ bgcolor: "#3b82f6" }}>SP</Avatar>
+            {username && <Avatar {...stringAvatar(username)} />}
           </Button>
           <Menu
             id="basic-menu"
@@ -65,7 +74,7 @@ const Header = () => {
             }}
           >
             <MenuItem onClick={handleClose} style={{ fontWeight: "600" }}>
-              Hi, Sahil Patel
+              Hi, {username}
             </MenuItem>
             <MenuItem
               onClick={handleLogout}

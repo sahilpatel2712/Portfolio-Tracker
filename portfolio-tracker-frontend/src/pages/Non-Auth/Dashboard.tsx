@@ -2,9 +2,15 @@ import StockTable from "../../components/StockTable";
 import DistributionChart from "../../components/DistributionChart";
 import React from "react";
 import FormModal from "../../components/FormModal";
+import { useAppSelector } from "../../redux/hooks";
+import {
+  leastPerformerStock,
+  topPerformerStock,
+} from "../../utils/stocksUtils";
 
 const Dashboard = () => {
   const [openModal, setOpenModal] = React.useState(false);
+  const stocksData = useAppSelector((state) => state.portfolio.stockData);
   const handleOpenFormModal = () => {
     setOpenModal(true);
   };
@@ -16,36 +22,14 @@ const Dashboard = () => {
         <StockTable
           tableType="profit"
           classes="min-[601px]:mt-7 max-[600px]:mb-5 mb-7"
-          stocksData={[
-            {
-              stockName: "HDFCBANK",
-              quantity: 25,
-              currentPrice: 1650.0,
-              averagePrice: 1600.0,
-              investedAmount: 40000.0,
-              marketValue: 41250.0,
-              overall: 1250.0,
-              isProfit: true,
-            },
-          ]}
+          stocksData={topPerformerStock(stocksData)}
           handleOpenFormModal={handleOpenFormModal}
         />
         <p className="w-full font-medium text-xl">Least Performer</p>
         <StockTable
           tableType="loss"
           classes="min-[601px]:mt-7"
-          stocksData={[
-            {
-              stockName: "ADANIGREEN",
-              quantity: 9,
-              currentPrice: 1031.05,
-              averagePrice: 1672.56,
-              investedAmount: 15053.04,
-              marketValue: 9279.45,
-              overall: -5773.59,
-              isProfit: false,
-            },
-          ]}
+          stocksData={leastPerformerStock(stocksData)}
           handleOpenFormModal={handleOpenFormModal}
         />
       </div>

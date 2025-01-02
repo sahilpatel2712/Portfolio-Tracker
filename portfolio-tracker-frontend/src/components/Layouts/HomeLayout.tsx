@@ -1,7 +1,6 @@
 import { Outlet } from "react-router";
 import Summary from "../Summary";
 import StocksList from "../StocksList";
-import React from "react";
 
 const HomeLayout = () => {
   return (
@@ -18,4 +17,4 @@ const HomeLayout = () => {
   );
 };
 
-export default React.memo(HomeLayout);
+export default HomeLayout;

@@ -2,6 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import TextInput from "../../components/TextInput";
 import { signinSchema, SigninValuesType } from "../../schema/authValidation";
 import { useForm } from "react-hook-form";
+import { useAppDispatch } from "../../redux/hooks";
+import { userSignIn } from "../../redux/auth/authSlice";
+import { useNavigate } from "react-router";
 
 const Signin = () => {
   const {
@@ -11,9 +14,14 @@ const Signin = () => {
   } = useForm<SigninValuesType>({
     resolver: zodResolver(signinSchema),
   });
-
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const onSubmit = async (value: SigninValuesType) => {
-    console.log(value);
+    dispatch(
+      userSignIn(value, () => {
+        navigate("/dashboard");
+      })
+    );
   };
   return (
     <div className="w-full">
