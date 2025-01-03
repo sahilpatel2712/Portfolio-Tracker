@@ -1,3 +1,6 @@
+import { useNavigate } from "react-router";
+import { useAppDispatch } from "../redux/hooks";
+import { deleteStock } from "../redux/portfolio/portfolioSlice";
 import { FormModalType } from "./FormModal";
 import { Backdrop, Box, Button, Fade, Modal } from "@mui/material";
 
@@ -20,9 +23,19 @@ const style = {
 const DeleteConformModal = ({
   open,
   setOpen,
-}: Pick<FormModalType, "open" | "setOpen">) => {
+  stockId,
+}: Pick<FormModalType, "open" | "setOpen"> & { stockId: string | null }) => {
   const handleClose = () => setOpen(false);
-
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const handleDelete = () => {
+    dispatch(
+      deleteStock(stockId || "", (path: string) => {
+        navigate(path);
+      })
+    );
+    setOpen(false);
+  };
   return (
     <div>
       <Modal
@@ -59,7 +72,7 @@ const DeleteConformModal = ({
                 </Button>
                 <Button
                   color="inherit"
-                  onClick={() => setOpen(false)}
+                  onClick={handleDelete}
                   style={{
                     backgroundColor: "#1e40af",
                     fontWeight: "600",

@@ -27,12 +27,14 @@ export const getStocks = async (req: Request, res: Response) => {
         investedAmount: true,
       },
     });
-    const enrichedStocks = await Promise.all(
+    const stocksData = await Promise.all(
       userStocks.map(async (stock) => await calculateStocksProfit(stock))
     );
     res.status(201).json({
       message: "Portfolio fetch successfully",
-      payload: enrichedStocks,
+      payload: {
+        stocksData: stocksData,
+      },
     });
   } catch (error) {
     console.log("error in get stock", error);
@@ -105,12 +107,24 @@ export const updateStocks = async (req: Request, res: Response) => {
     const updatedStock = await prisma.stocks.update({
       where: { id: id, userId: userId },
       data: { ...body, investedAmount: investedAmount },
+      select: {
+        id: true,
+        stockName: true,
+        ticker: true,
+        averagePrice: true,
+        quantity: true,
+        investedAmount: true,
+      },
     });
     if (!updatedStock) {
       res.status(404).json({ message: "Stock not found" });
       return;
     }
-    res.status(200).json({ message: "Stock updated successfully" });
+    const stockData = await calculateStocksProfit(updatedStock);
+    res.status(200).json({
+      message: "Stock updated successfully",
+      payload: { updatedStock: stockData },
+    });
   } catch (error) {
     console.log("error in update stock", error);
     res.status(500).json({ message: "Internal server error" });
@@ -138,7 +152,10 @@ export const deleteStocks = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Stock not found" });
       return;
     }
-    res.status(200).json({ message: "Stock deleted successfully" });
+    res.status(200).json({
+      message: "Stock deleted successfully",
+      payload: { id: deletedStock.id },
+    });
   } catch (error) {
     console.log("error in delete stock", error);
     res.status(500).json({ message: "Internal server error" });

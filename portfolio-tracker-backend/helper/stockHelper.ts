@@ -2,6 +2,7 @@ import axios from "axios";
 import prisma from "../db";
 import { StockValueType } from "./zodSchema";
 import { stocksArray } from "./stockArray";
+import { finnhubApiService } from "./finnhubApiService";
 
 export const addManyStocks = async (
   stocksData: StockValueType[],
@@ -33,9 +34,7 @@ export const addRandomStocks = async (userId: string) => {
   try {
     const enrichedStocks = await Promise.all(
       stocksArray.map(async (stock) => {
-        const response = await axios.get(
-          `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=${process.env.FINNHUB_TOKEN}`
-        );
+        const response = await finnhubApiService(stock.ticker);
 
         const averagePrice = response.data.c;
 
@@ -56,14 +55,15 @@ export const addRandomStocks = async (userId: string) => {
 };
 
 export const calculateStocksProfit = async (stock: {
+  id: string;
+  stockName: string;
   ticker: string;
-  investedAmount: number;
   quantity: number;
+  averagePrice: number;
+  investedAmount: number;
 }) => {
   try {
-    const response = await axios.get(
-      `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=${process.env.FINNHUB_TOKEN}`
-    );
+    const response = await finnhubApiService(stock.ticker);
 
     const currentPrice = response.data.c as number;
     const currentTotalValue = currentPrice * stock.quantity;
@@ -72,7 +72,7 @@ export const calculateStocksProfit = async (stock: {
 
     return {
       ...stock,
-      currentPrice:currentPrice.toFixed(2),
+      currentPrice: currentPrice.toFixed(2),
       overall,
       isProfit,
     };

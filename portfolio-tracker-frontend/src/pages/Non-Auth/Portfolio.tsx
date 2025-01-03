@@ -5,34 +5,25 @@ import FormModal from "../../components/FormModal";
 import React from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { isValidArray } from "../../utils/objectsValidation";
+import { StockFormType } from "../../schema/stockFormValidation";
+import { stockFilter } from "../../utils/stocksUtils";
+
+export type FormValueType = StockFormType & { id?: string };
 
 const Portfolio = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [searchStock, setSearchStock] = React.useState<string>("");
-  const stocksData = useAppSelector((state) => state.portfolio.stockData);
+  const stocksData = useAppSelector((state) => state.portfolio.stocksData);
   const [filterStocks, setFilterStocks] = React.useState<StockDataType[]>([]);
-  const handleOpenFormModal = () => {
+  const [formValue, setFormValue] = React.useState<null | FormValueType>(null);
+  const handleOpenFormModal = (stockData: FormValueType | null) => {
+    setFormValue(stockData);
     setOpenModal(true);
   };
   const handleFilter = (searchText: string) => {
     if (isValidArray(stocksData)) {
       if (searchText) {
-        setFilterStocks(() => {
-          const searched = stocksData.filter((stock) =>
-            stock.stockName.toLowerCase().includes(searchText.toLowerCase())
-          );
-          searched.sort((a, b) => {
-            const indexA = a.stockName
-              .toLowerCase()
-              .indexOf(searchText.toLowerCase());
-            const indexB = b.stockName
-              .toLowerCase()
-              .indexOf(searchText.toLowerCase());
-            return indexA - indexB;
-          });
-
-          return searched;
-        });
+        setFilterStocks(() => stockFilter(stocksData, searchText.trim()));
       } else {
         setFilterStocks(stocksData);
       }
@@ -41,6 +32,7 @@ const Portfolio = () => {
   React.useEffect(() => {
     handleFilter(searchStock);
   }, [stocksData, searchStock]);
+
   return (
     <div className="w-full flex flex-col">
       <p className="w-full font-medium text-xl">Holdings</p>
@@ -63,7 +55,7 @@ const Portfolio = () => {
               fontSize: 12,
               fontWeight: "600",
             }}
-            onClick={handleOpenFormModal}
+            onClick={() => handleOpenFormModal(null)}
           >
             Add Stocks
           </Button>
@@ -74,7 +66,11 @@ const Portfolio = () => {
         classes="min-[601px]:my-5 max-[600px]:border-[#fff] max-[600px]:border-opacity-20 max-[600px]:pt-4 max-[600px]:px-2  max-[600px]:border-t-[1px]"
         handleOpenFormModal={handleOpenFormModal}
       />
-      <FormModal open={openModal} setOpen={setOpenModal} />
+      <FormModal
+        open={openModal}
+        setOpen={setOpenModal}
+        formValues={formValue}
+      />
     </div>
   );
 };

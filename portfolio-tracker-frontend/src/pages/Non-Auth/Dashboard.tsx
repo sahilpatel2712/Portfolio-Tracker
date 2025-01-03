@@ -7,13 +7,17 @@ import {
   leastPerformerStock,
   topPerformerStock,
 } from "../../utils/stocksUtils";
+import { FormValueType } from "./Portfolio";
 
 const Dashboard = () => {
   const [openModal, setOpenModal] = React.useState(false);
-  const stocksData = useAppSelector((state) => state.portfolio.stockData);
-  const handleOpenFormModal = () => {
-    setOpenModal(true);
-  };
+  const stocksData = useAppSelector((state) => state.portfolio.stocksData);
+    const [formValue, setFormValue] = React.useState<null | FormValueType>(null);
+  
+  const handleOpenFormModal = (stockData: FormValueType | null) => {
+     setFormValue(stockData);
+     setOpenModal(true);
+   };
 
   return (
     <>
@@ -34,7 +38,7 @@ const Dashboard = () => {
         />
       </div>
       <DistributionChart />
-      <FormModal open={openModal} setOpen={setOpenModal} />
+      <FormModal open={openModal} setOpen={setOpenModal} formValues={formValue} />
     </>
   );
 };

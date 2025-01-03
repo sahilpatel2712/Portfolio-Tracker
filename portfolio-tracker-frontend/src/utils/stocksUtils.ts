@@ -24,3 +24,61 @@ export const leastPerformerStock = (stocksData: StockDataType[]) => {
   }
   return [];
 };
+
+export const numberToCurrency = (amount: number | string) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(Number(amount));
+};
+export const formatAmount = (amount: number | string) => {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(amount));
+};
+
+export const stockFilter = (
+  stocksData: StockDataType[],
+  searchText: string
+) => {
+  const searched = stocksData.filter((stock) =>
+    stock.stockName.toLowerCase().includes(searchText.toLowerCase())
+  );
+  searched.sort((a, b) => {
+    const indexA = a.stockName.toLowerCase().indexOf(searchText.toLowerCase());
+    const indexB = b.stockName.toLowerCase().indexOf(searchText.toLowerCase());
+    return indexA - indexB;
+  });
+
+  return searched;
+};
+
+export const findPortfolioSummary = (stocksData: StockDataType[]) => {
+  let totalInvestment = 0,
+    totalCurrentPrice = 0;
+  stocksData.forEach((stock) => {
+    totalInvestment += Number(stock.investedAmount);
+    totalCurrentPrice += Number(stock.currentPrice);
+  });
+  const difference = (totalCurrentPrice - totalInvestment).toFixed(2);
+
+  return {
+    totalCurrentPrice: totalCurrentPrice.toFixed(2),
+    totalInvestment: totalInvestment.toFixed(2),
+    difference,
+  };
+};
+
+export const updateStockChange = (
+  stocksData: StockDataType[],
+  updatedStock: StockDataType
+) => {
+  if (updatedStock.id.trim()) {
+    const newStocksData = stocksData.map((stock) =>
+      stock.id === updatedStock.id ? updatedStock : stock
+    );
+    return newStocksData;
+  }
+  return stocksData;
+};

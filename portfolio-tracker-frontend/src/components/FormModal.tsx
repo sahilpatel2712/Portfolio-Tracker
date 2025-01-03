@@ -8,6 +8,11 @@ import { Button } from "@mui/material";
 import { stockFormSchema, StockFormType } from "../schema/stockFormValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormRegisterReturn } from "react-hook-form";
+import { isValidObject } from "../utils/objectsValidation";
+import { useAppDispatch } from "../redux/hooks";
+import { FormValueType } from "../pages/Non-Auth/Portfolio";
+import { updatePortfolio } from "../redux/portfolio/portfolioSlice";
+import { useNavigate } from "react-router";
 
 const style = {
   position: "absolute",
@@ -28,6 +33,7 @@ const style = {
 export type FormModalType = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  formValues?: FormValueType | null;
 };
 
 type FormInputType = {
@@ -38,20 +44,51 @@ type FormInputType = {
   registerProps: UseFormRegisterReturn;
 };
 
-const FormModal = ({ open, setOpen }: FormModalType) => {
+const defaultFormValue = {
+  stockName: "",
+  ticker: "",
+  quantity: 0,
+  averagePrice: 0,
+};
+
+const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<StockFormType>({
     resolver: zodResolver(stockFormSchema),
+    defaultValues: defaultFormValue,
   });
 
   const onSubmit = async (value: StockFormType) => {
-    console.log(value);
+    dispatch(
+      updatePortfolio(value, formValues?.id || "", (path: string) => {
+        navigate(path);
+      })
+    );
+    reset(defaultFormValue);
+    setOpen(false);
+  };
+  const handleClose = () => {
+    reset(defaultFormValue);
+    setOpen(false);
   };
 
-  const handleClose = () => setOpen(false);
+  React.useEffect(() => {
+    if (isValidObject(formValues)) {
+      const obj = {
+        averagePrice: Number(formValues?.averagePrice) || 0,
+        stockName: formValues?.stockName || "",
+        ticker: formValues?.ticker || "",
+        quantity: Number(formValues?.quantity) || 0,
+      };
+      reset(obj);
+    }
+  }, [formValues]);
 
   return (
     <div>
@@ -103,7 +140,9 @@ const FormModal = ({ open, setOpen }: FormModalType) => {
                     placeholder="23.5"
                     type="number"
                     error={errors.averagePrice?.message}
-                    registerProps={register("averagePrice", { valueAsNumber: true })}
+                    registerProps={register("averagePrice", {
+                      valueAsNumber: true,
+                    })}
                   />
                 </div>
                 <div className="w-full flex justify-end gap-3 mt-4">
@@ -114,7 +153,9 @@ const FormModal = ({ open, setOpen }: FormModalType) => {
                       fontWeight: "600",
                       fontSize: 12,
                     }}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      handleClose();
+                    }}
                   >
                     Cancel
                   </Button>

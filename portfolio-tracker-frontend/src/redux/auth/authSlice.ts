@@ -33,7 +33,7 @@ export const userSignUp = (
   navigation: () => void
 ) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(setSpinner(true));
+    dispatch(setSpinner(1));
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL + "api/v1/user/signup"}`,
@@ -51,7 +51,7 @@ export const userSignUp = (
         errorToast(error.response?.data?.message || error?.message);
       }
     }
-    dispatch(setSpinner(false));
+    dispatch(setSpinner(-1));
   };
 };
 
@@ -60,7 +60,7 @@ export const userSignIn = (
   navigation: () => void
 ) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(setSpinner(true));
+    dispatch(setSpinner(1));
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URL + "api/v1/user/signin"}`,
@@ -78,13 +78,13 @@ export const userSignIn = (
         errorToast(error.response?.data?.message || error?.message);
       }
     }
-    dispatch(setSpinner(false));
+    dispatch(setSpinner(-1));
   };
 };
 
 export const getUserData = (navigation: (path: string) => void) => {
   return async (dispatch: AppDispatch) => {
-    dispatch(setSpinner(true));
+    dispatch(setSpinner(1));
     try {
       const token = localStorage.getItem("userAuthToken");
       const response = await axios.get(
@@ -109,7 +109,7 @@ export const getUserData = (navigation: (path: string) => void) => {
         }
       }
     }
-    dispatch(setSpinner(false));
+    dispatch(setSpinner(-1));
   };
 };
 

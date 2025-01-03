@@ -3,7 +3,7 @@ import { getUserData } from "../../redux/auth/authSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import Header from "../Header";
 import { Outlet, useNavigate } from "react-router";
-import { fetchPortfolio } from "../../redux/porfolio/portfolio";
+import { fetchPortfolio } from "../../redux/portfolio/portfolioSlice";
 
 const RootLayout = () => {
   const dispatch = useAppDispatch();

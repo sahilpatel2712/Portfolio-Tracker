@@ -12,7 +12,7 @@ export default function App() {
   return (
     <>
       <Toaster reverseOrder={true} position="bottom-center" />
-      {isLoading ? <Loader /> : null}
+      {isLoading>0 ? <Loader /> : null}
       <Routes>
         <Route element={<Layout />}>
           {Auth()}
