@@ -11,7 +11,7 @@ import { useForm, UseFormRegisterReturn } from "react-hook-form";
 import { isValidObject } from "../utils/objectsValidation";
 import { useAppDispatch } from "../redux/hooks";
 import { FormValueType } from "../pages/Non-Auth/Portfolio";
-import { updatePortfolio } from "../redux/portfolio/portfolioSlice";
+import { addStock, updatePortfolio } from "../redux/portfolio/portfolioSlice";
 import { useNavigate } from "react-router";
 
 const style = {
@@ -65,13 +65,16 @@ const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
   });
 
   const onSubmit = async (value: StockFormType) => {
-    dispatch(
-      updatePortfolio(value, formValues?.id || "", (path: string) => {
-        navigate(path);
-      })
-    );
+    if (formValues?.id) {
+      dispatch(updatePortfolio(value, formValues?.id || "", handleNavigate));
+    } else {
+      dispatch(addStock(value, handleNavigate));
+    }
     reset(defaultFormValue);
     setOpen(false);
+  };
+  const handleNavigate = (path: string) => {
+    navigate(path);
   };
   const handleClose = () => {
     reset(defaultFormValue);
@@ -204,3 +207,5 @@ const FormInput = ({
     </div>
   );
 };
+
+

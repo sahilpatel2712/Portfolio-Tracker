@@ -65,6 +65,56 @@ export const fetchPortfolio = (navigation: (path: string) => void) => {
         errorToast(error.response?.data?.message || error?.message);
         const statusCode = error.response?.status;
         if (statusCode === 401) {
+          localStorage.removeItem("userAuthToken");
+          navigation("/signin");
+        }
+      }
+    }
+    dispatch(setSpinner(-1));
+  };
+};
+
+export const addStock = (
+  data: StockFormType,
+  navigation: (path: string) => void
+) => {
+  return async (dispatch: AppDispatch, getState: getStateType) => {
+    dispatch(setSpinner(1));
+    try {
+      const token = localStorage.getItem("userAuthToken");
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}api/v1/stock/add/`,
+        data,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (isValidObject(response.data.payload.stockData)) {
+        const stocksData = getState().portfolio.stocksData;
+        const newStocksData = [
+          ...stocksData,
+          response.data.payload.stockData,
+        ];
+
+        const portfolioSummary = findPortfolioSummary(newStocksData);
+        dispatch(
+          setPortfolio({
+            stocksData: newStocksData,
+            portfolioSummary,
+          })
+        );
+        if (response.data.message) {
+          successToast(response.data.message);
+        }
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        errorToast(error.response?.data?.message || error?.message);
+        const statusCode = error.response?.status;
+        if (statusCode === 401) {
+          localStorage.removeItem("userAuthToken");
           navigation("/signin");
         }
       }
@@ -118,6 +168,7 @@ export const updatePortfolio = (
         errorToast(error.response?.data?.message || error?.message);
         const statusCode = error.response?.status;
         if (statusCode === 401) {
+          localStorage.removeItem("userAuthToken");
           navigation("/signin");
         }
       }
@@ -164,6 +215,7 @@ export const deleteStock = (id: string, navigation: (path: string) => void) => {
         errorToast(error.response?.data?.message || error?.message);
         const statusCode = error.response?.status;
         if (statusCode === 401) {
+          localStorage.removeItem("userAuthToken");
           navigation("/signin");
         }
       }

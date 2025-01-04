@@ -6,7 +6,34 @@ import {
   UpdateStockValueType,
 } from "../helper/zodSchema";
 import prisma from "../db";
-import { addManyStocks, calculateStocksProfit } from "../helper/stockHelper";
+import {
+  calculateStocksProfit,
+  investedAmountCal,
+} from "../helper/stockHelper";
+import { searchFinnhubSocks } from "../helper/finnhubApiService";
+
+export const searchStocks = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+  const query = req.query;
+  try {
+    let response;
+    if (query.q) {
+      response = await searchFinnhubSocks((query.q as string) || "", "");
+    } else {
+      response = await searchFinnhubSocks((query.q as string) || "", "US");
+    }
+    res.status(201).json({
+      message: "",
+      payload: { searchedStocks: response.data.result || [] },
+    });
+  } catch (error) {
+    console.log("error in search stock", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 export const getStocks = async (req: Request, res: Response) => {
   const userId = req.user?.id;
@@ -58,19 +85,71 @@ export const addStocks = async (req: Request, res: Response) => {
     return;
   }
   try {
-    const payload = [
-      {
+    let addedStock;
+    const existingStock = await prisma.stocks.findUnique({
+      where: {
+        userId_ticker: {
+          userId: userId!,
+          ticker: body.ticker.trim(),
+        },
+      },
+    });
+
+    if (existingStock) {
+      const newQuantity = existingStock.quantity + body.quantity;
+
+      const newAveragePrice =
+        (existingStock.averagePrice * existingStock.quantity +
+          body.averagePrice * body.quantity) /
+        newQuantity;
+      addedStock = await prisma.stocks.update({
+        where: {
+          userId: userId,
+          id: existingStock.id,
+        },
+        data: {
+          quantity: newQuantity,
+          averagePrice: Number(newAveragePrice.toFixed(2)),
+          investedAmount: investedAmountCal(newAveragePrice, newQuantity),
+        },
+        select: {
+          id: true,
+          stockName: true,
+          ticker: true,
+          averagePrice: true,
+          quantity: true,
+          investedAmount: true,
+        },
+      });
+    } else {
+      const payload = {
         stockName: body.stockName,
         ticker: body.ticker,
-        quantity: body.quantity,
-        averagePrice: body.averagePrice,
-      },
-    ];
-    const addedStocks = await addManyStocks(payload, userId!);
-    if (addedStocks.count === 0) {
+        quantity: Number(body.quantity),
+        averagePrice: Number(body.averagePrice),
+        investedAmount: investedAmountCal(body.averagePrice, body.quantity),
+        userId: userId!,
+      };
+      addedStock = await prisma.stocks.create({
+        data: payload,
+        select: {
+          id: true,
+          stockName: true,
+          ticker: true,
+          averagePrice: true,
+          quantity: true,
+          investedAmount: true,
+        },
+      });
+    }
+    if (!addedStock) {
       res.status(500).json({ message: "Internal server error" });
     }
-    res.status(201).json({ message: "Stock add in portfolio" });
+    const stockData = await calculateStocksProfit(addedStock);
+    res.status(201).json({
+      message: "Stock added in portfolio",
+      payload: { stockData: stockData },
+    });
   } catch (error) {
     console.log("error in add stock", error);
     res.status(500).json({ message: "Internal server error" });
@@ -103,7 +182,10 @@ export const updateStocks = async (req: Request, res: Response) => {
   }
 
   try {
-    const investedAmount = Number(body.averagePrice) * Number(body.quantity);
+    const investedAmount = investedAmountCal(
+      body.averagePrice!,
+      body.quantity!
+    );
     const updatedStock = await prisma.stocks.update({
       where: { id: id, userId: userId },
       data: { ...body, investedAmount: investedAmount },

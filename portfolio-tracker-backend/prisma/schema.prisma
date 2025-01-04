@@ -31,4 +31,6 @@ model Stocks {
   investedAmount Float
 
   user User @relation("stock", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ticker])
 }

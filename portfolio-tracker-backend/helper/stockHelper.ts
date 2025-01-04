@@ -1,4 +1,3 @@
-import axios from "axios";
 import prisma from "../db";
 import { StockValueType } from "./zodSchema";
 import { stocksArray } from "./stockArray";
@@ -23,11 +22,18 @@ export const calculateInvestmentAmount = (
   const updatedArray = stocksData.map((stock) => {
     return {
       ...stock,
-      investedAmount: Number(stock.averagePrice) * Number(stock.quantity),
+      investedAmount: investedAmountCal(stock.averagePrice, stock.quantity),
       userId: userId,
     };
   });
   return updatedArray;
+};
+
+export const investedAmountCal = (
+  averagePrice: string | number,
+  quantity: string | number
+) => {
+  return Number((Number(averagePrice) * Number(quantity)).toFixed(2));
 };
 
 export const addRandomStocks = async (userId: string) => {

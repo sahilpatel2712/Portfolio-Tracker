@@ -59,7 +59,7 @@ export const findPortfolioSummary = (stocksData: StockDataType[]) => {
     totalCurrentPrice = 0;
   stocksData.forEach((stock) => {
     totalInvestment += Number(stock.investedAmount);
-    totalCurrentPrice += Number(stock.currentPrice);
+    totalCurrentPrice += (Number(stock.currentPrice) * Number(stock.quantity));
   });
   const difference = (totalCurrentPrice - totalInvestment).toFixed(2);
 
@@ -82,3 +82,4 @@ export const updateStockChange = (
   }
   return stocksData;
 };
+

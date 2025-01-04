@@ -98,6 +98,7 @@ export const getUserData = (navigation: (path: string) => void) => {
       if (response.data.payload.username) {
         dispatch(setUsername(response.data.payload.username));
       } else {
+        localStorage.removeItem("userAuthToken");
         navigation("/signin");
       }
     } catch (error) {
@@ -105,6 +106,7 @@ export const getUserData = (navigation: (path: string) => void) => {
         errorToast(error.response?.data?.message || error?.message);
         const statusCode = error.response?.status;
         if (statusCode === 401) {
+          localStorage.removeItem("userAuthToken");
           navigation("/signin");
         }
       }
