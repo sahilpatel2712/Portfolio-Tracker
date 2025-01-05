@@ -9,9 +9,33 @@ import prisma from "../db";
 import {
   calculateStocksProfit,
   investedAmountCal,
+  searchStockData,
 } from "../helper/stockHelper";
 import { searchFinnhubSocks } from "../helper/finnhubApiService";
 
+export const getStockData = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+  const query = req.query;
+  try {
+    if (query.ticker) {
+      const stockData = await searchStockData(
+        (query?.ticker as string) || "",
+      );
+      res.status(201).json({
+        message: "",
+        payload: { stockData: stockData || {} },
+      });
+      return;
+    }
+    res.status(400).json({ message: "Doesn't provide Ticker or Stock Name" });
+  } catch (error) {
+    console.log("error in search stock", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 export const searchStocks = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
@@ -182,6 +206,19 @@ export const updateStocks = async (req: Request, res: Response) => {
   }
 
   try {
+    const findStock = await prisma.stocks.findFirst({
+      where: {
+        ticker: body.ticker,
+        userId: userId,
+        id: { not: id },
+      },
+    });
+    if (findStock) {
+      res
+        .status(400)
+        .json({ message: "Stock Name already exist in portfolio" });
+      return;
+    }
     const investedAmount = investedAmountCal(
       body.averagePrice!,
       body.quantity!

@@ -1,11 +1,14 @@
 import { PieChart } from "@mui/x-charts";
+import { useAppSelector } from "../redux/hooks";
+import { numberToCurrency } from "../utils/stocksUtils";
 
 const DistributionChart = () => {
+  const portfolioData = useAppSelector((state) => state.portfolio);
   return (
     <div className="w-full pb-5 flex justify-between flex-wrap gap-20">
       <div className="flex-1 flex flex-col max-[960px]:items-center">
         <p className="w-full font-medium text-xl mb-10 max-[960px]:text-center">
-          Amount Distribution - $ 80,491.52
+          Total Amount Distribution - {numberToCurrency(portfolioData.portfolioSummary.totalInvestment)}
         </p>
         <PieChart
           series={[
@@ -18,6 +21,8 @@ const DistributionChart = () => {
                 { id: 4, value: 10, label: "series e" },
                 { id: 5, value: 25, label: "series f" },
               ],
+              
+              
             },
           ]}
           slotProps={{
@@ -35,12 +40,13 @@ const DistributionChart = () => {
               labelStyle: { fill: "#fff" },
             },
           }}
+          
           className="max-w-[400px] min-w-[320px] w-full min-h-[200px]"
         />
       </div>
       <div className="flex-1 flex flex-col max-[960px]:items-center">
         <p className="w-full font-medium text-xl mb-10 max-[960px]:text-center">
-          Profit Distribution - $ 80,491.52
+          Profit Distribution - {numberToCurrency(portfolioData.portfolioSummary.totalCurrentPrice)}
         </p>
         <PieChart
           series={[

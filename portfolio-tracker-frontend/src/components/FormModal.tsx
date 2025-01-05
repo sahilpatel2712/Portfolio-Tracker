@@ -1,18 +1,26 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
 import TextInput from "./TextInput";
+import Fade from "@mui/material/Fade";
 import { Button } from "@mui/material";
+import Select, { SingleValue } from "react-select";
 import { stockFormSchema, StockFormType } from "../schema/stockFormValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, UseFormRegisterReturn } from "react-hook-form";
+import {
+  useForm,
+  UseFormGetValues,
+  UseFormRegisterReturn,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { isValidObject } from "../utils/objectsValidation";
 import { useAppDispatch } from "../redux/hooks";
 import { FormValueType } from "../pages/Non-Auth/Portfolio";
 import { addStock, updatePortfolio } from "../redux/portfolio/portfolioSlice";
-import { useNavigate } from "react-router";
+import { searchStock } from "../api/stocksApi";
 
 const style = {
   position: "absolute",
@@ -30,10 +38,23 @@ const style = {
   backgroundColor: "#101115",
 };
 
+export type OptionType = {
+  description: string;
+  symbol: string;
+};
 export type FormModalType = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   formValues?: FormValueType | null;
+};
+type SearchSelectPropsType = Pick<
+  FormInputType,
+  "placeholder" | "error" | "label"
+> & {
+  name: "stockName" | "ticker" | "quantity" | "averagePrice";
+  getValues: UseFormGetValues<StockFormType>;
+  setValue: UseFormSetValue<StockFormType>;
+  watch: UseFormWatch<StockFormType>;
 };
 
 type FormInputType = {
@@ -57,8 +78,11 @@ const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
     reset,
+    watch,
   } = useForm<StockFormType>({
     resolver: zodResolver(stockFormSchema),
     defaultValues: defaultFormValue,
@@ -80,7 +104,6 @@ const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
     reset(defaultFormValue);
     setOpen(false);
   };
-
   React.useEffect(() => {
     if (isValidObject(formValues)) {
       const obj = {
@@ -113,19 +136,23 @@ const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="w-full text-white flex flex-col items-center">
                 <div className="w-full flex justify-between gap-5">
-                  <FormInput
-                    label="Name"
+                  <SearchSelect
+                    label="Stock Name"
                     placeholder="Apple Inc"
-                    type="text"
                     error={errors.stockName?.message}
-                    registerProps={register("stockName")}
+                    name="stockName"
+                    getValues={getValues}
+                    watch={watch}
+                    setValue={setValue}
                   />
-                  <FormInput
+                  <SearchSelect
                     label="Ticker"
                     placeholder="AAPL"
-                    type="text"
                     error={errors.ticker?.message}
-                    registerProps={register("ticker")}
+                    name="ticker"
+                    getValues={getValues}
+                    watch={watch}
+                    setValue={setValue}
                   />
                 </div>
                 <div className="w-full flex justify-between gap-5">
@@ -141,7 +168,7 @@ const FormModal = ({ open, setOpen, formValues }: FormModalType) => {
                   <FormInput
                     label="Price"
                     placeholder="23.5"
-                    type="number"
+                    type="text"
                     error={errors.averagePrice?.message}
                     registerProps={register("averagePrice", {
                       valueAsNumber: true,
@@ -208,4 +235,96 @@ const FormInput = ({
   );
 };
 
+const SearchSelect = ({
+  placeholder,
+  label,
+  error,
+  name,
+  getValues,
+  watch,
+  setValue,
+}: SearchSelectPropsType) => {
+  const [options, setOptions] = React.useState<OptionType[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [inputText, setInputText] = React.useState<string>("");
+  const searchTimeout = React.useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
 
+  const handleSearch = (searchText: string) => {
+    setInputText(searchText);
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(async () => {
+      if (searchText.trim()) {
+        setIsLoading(true);
+
+        const response = await searchStock(searchText, false, (path: string) =>
+          navigate(path)
+        );
+        const stocks = response?.data.payload.searchedStocks || [];
+        setOptions(()=>stocks);
+
+        setIsLoading(false);
+      }
+    }, 300);
+  };
+
+  const handleSelect = (value: SingleValue<OptionType>) => {
+    setValue("stockName", value?.description || "");
+    setValue("ticker", value?.symbol || "");
+  };
+  watch(name);
+  return (
+    <div className="w-[100%] mb-4 flex flex-col gap-1">
+      <label className="font-semibold" htmlFor={name}>
+        {label}
+      </label>
+
+      <Select
+        options={options}
+        value={{
+          description: getValues("stockName"),
+          symbol: getValues("ticker"),
+        }}
+        isSearchable={true}
+        hideSelectedOptions={true}
+        inputValue={inputText}
+        getOptionLabel={(e) =>
+          name === "ticker" ? e.symbol : `${e.description} ${e.symbol}`
+        }
+        getOptionValue={(e) => (name === "ticker" ? e.symbol : e.description)}
+        placeholder={placeholder}
+        onChange={handleSelect}
+        onInputChange={handleSearch}
+        isLoading={isLoading}
+        components={{
+          DropdownIndicator: () => null,
+        }}
+        className="w-full shadow rounded-md focus:outline-none focus:shadow-none focus:ring-0 !bg-bgColor-custom !text-white !border-white !border-[0.5px] !border-opacity-20"
+        styles={{
+          control: (baseStyle) => ({
+            ...baseStyle,
+            backgroundColor: "#1e1e1e",
+            border: "none",
+          }),
+        }}
+        classNames={{
+          indicatorSeparator: () => "hidden",
+          menuList: () => "bg-bgColor-custom",
+          singleValue: () => "!text-white",
+          option: () => "hover:!bg-bgColor !bg-transparent",
+          input: () => "!text-white",
+        }}
+      />
+
+      {error && (
+        <p className="m-0 text-red-500 font-bold text-[13px] ms-2 mt-1">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+};

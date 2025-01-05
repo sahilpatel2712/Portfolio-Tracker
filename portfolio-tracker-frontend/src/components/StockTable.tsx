@@ -76,9 +76,9 @@ const StockTable = ({
         >
           <div className="flex-1 break-words">Stock Name</div>
           <div className="flex-1 break-words">Quantity</div>
-          <div className="flex-1 break-words">Today's Price</div>
+          <div className="flex-1 break-words">Current Price</div>
           <div className="flex-1 break-words">Average Price</div>
-          <div className="flex-1 break-words hidden lg:block">Amount</div>
+          <div className="flex-1 break-words hidden lg:block">Inv. Amount</div>
           <div className="flex-1 break-words">Gain/Loss</div>
           <div className="flex-1 break-words hidden lg:block"></div>
         </div>
@@ -157,7 +157,7 @@ const StockSlot = (stockProp: StockSlotType) => {
         className={`w-full flex justify-between ${stockProp.classes}`}
       >
         <div className="flex flex-col gap-1 text-left max-w-[40%]">
-          <Tooltip title={stockProp.stockName}>
+          <Tooltip title={`${stockProp.stockName} (${stockProp.ticker})`} >
             <p className="text-lg truncate">{stockProp.stockName}</p>
           </Tooltip>
           <p className="font-normal text-sm">
@@ -247,7 +247,7 @@ const TableCP = (stockProp: StockSlotType) => {
         onClick={handleClick}
         className="flex w-full font-medium py-2 hover:bg-slate-700 cursor-pointer hover:bg-opacity-40"
       >
-        <Tooltip title={stockProp.stockName}>
+        <Tooltip title={`${stockProp.stockName} (${stockProp.ticker})`}>
           <div className="flex-1 max-w-[50%] truncate">
             {stockProp.stockName}
           </div>

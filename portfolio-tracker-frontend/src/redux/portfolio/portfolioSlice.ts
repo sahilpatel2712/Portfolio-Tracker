@@ -93,10 +93,7 @@ export const addStock = (
       );
       if (isValidObject(response.data.payload.stockData)) {
         const stocksData = getState().portfolio.stocksData;
-        const newStocksData = [
-          ...stocksData,
-          response.data.payload.stockData,
-        ];
+        const newStocksData = [...stocksData, response.data.payload.stockData];
 
         const portfolioSummary = findPortfolioSummary(newStocksData);
         dispatch(
@@ -198,7 +195,6 @@ export const deleteStock = (id: string, navigation: (path: string) => void) => {
         const newStocksData = stocksData.filter(
           (stock) => stock.id !== response.data.payload.id
         );
-
         const portfolioSummary = findPortfolioSummary(newStocksData);
         dispatch(
           setPortfolio({

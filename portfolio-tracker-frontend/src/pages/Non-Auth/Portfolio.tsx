@@ -27,6 +27,8 @@ const Portfolio = () => {
       } else {
         setFilterStocks(stocksData);
       }
+    } else {
+      setFilterStocks([]);
     }
   };
   React.useEffect(() => {
@@ -34,7 +36,7 @@ const Portfolio = () => {
   }, [stocksData, searchStock]);
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col min-h-[calc(100vh-360px)] h-full w-full">
       <p className="w-full font-medium text-xl">Holdings</p>
       <div className="flex  w-full   justify-between  mt-5">
         <div className="w-full min-w-[160px] flex  gap-2 bg-bgColor px-3 py-1 h-[40px]  max-w-[30%] rounded-md border-[0.5px] border-opacity-50 border-[#e5e7eb]">

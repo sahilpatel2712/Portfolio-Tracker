@@ -87,3 +87,20 @@ export const calculateStocksProfit = async (stock: {
     throw error;
   }
 };
+
+export const searchStockData = async (ticker: string) => {
+  try {
+    const stockData = await finnhubApiService(ticker);
+
+    const processedStocks = {
+      ticker: ticker,
+      currentPrice: stockData.data.c || 0,
+      d: stockData.data.d || 0,
+      dp: (stockData.data?.dp && stockData.data?.dp.toFixed(2)) || "",
+      isUp: stockData.data.d >= 0,
+    };
+    return processedStocks;
+  } catch (error) {
+    console.error(`Error fetching data for ${ticker}:`, error);
+  }
+};

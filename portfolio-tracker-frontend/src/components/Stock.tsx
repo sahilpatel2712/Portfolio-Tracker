@@ -1,41 +1,72 @@
 import { Tooltip } from "@mui/material";
 import { IndicatorIcon } from "../assets/svgs";
+import React from "react";
+import { StockListType } from "./StocksList";
+import { getStockData } from "../api/stocksApi";
+import { useNavigate } from "react-router";
+import { isValidObject } from "../utils/objectsValidation";
+import { numberToCurrency } from "../utils/stocksUtils";
 
 type IndicatorValueType = {
-  indicatorValue: boolean;
   onClick: () => void;
-};
-const stockDetail = {
-  name: "TATATECH",
-  overAll: "+19.10",
-  price: "908.5",
+  stock: StockListType;
 };
 
-const Stock = ({ indicatorValue, onClick }: IndicatorValueType) => {
+type DailyStockType = {
+  ticker: string;
+  currentPrice: number | string;
+  d: number | string;
+  dp: number | string;
+  isUp: boolean;
+};
+
+const Stock = ({ onClick, stock }: IndicatorValueType) => {
+  const [stockData, setStockData] = React.useState<DailyStockType>();
+  const navigate = useNavigate();
+  const fetchStockData = async () => {
+    const response = await getStockData(stock.ticker, (path: string) => {
+      navigate(path);
+    });
+    if (response && isValidObject(response.data.payload.stockData)) {
+      setStockData(response.data.payload.stockData);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchStockData();
+  }, [stock]);
   return (
     <div
       className="w-full flex items-center justify-between border-t-[1px] border-t-[#e5e7eb] border-opacity-10 py-2 px-5 cursor-pointer hover:bg-slate-700 hover:bg-opacity-40"
       onClick={onClick}
     >
-      <Tooltip title={stockDetail.name}>
+      <Tooltip title={stock.ticker}>
         <div className="font-medium text-sm truncate max-w-[50%]">
-          {stockDetail.name}
+          {stock.stockName}
         </div>
       </Tooltip>
       <div className="font-medium flex flex-col gap-1">
-        <div className="flex items-center gap-1">
+        <div className="flex justify-end gap-1">
           <span
             className={`text-sm ${
-              indicatorValue
+              stockData?.isUp
                 ? "text-textColor-success"
                 : "text-textColor-danger"
             }`}
           >
-            {stockDetail.price}
+            {numberToCurrency(stockData?.currentPrice || 0)}
           </span>
-          <span className="text-[0.5rem]">{IndicatorIcon(indicatorValue)}</span>
+          <span className="text-[0.5rem] pt-1">
+            {IndicatorIcon(stockData?.isUp || false)}
+          </span>
         </div>
-        <span className="text-xs"> {stockDetail.overAll} </span>
+        <div className="w-full text-xs text-end">
+          <span className="mr-2">
+            {stockData?.d && Number(stockData?.d) > 0 ? "+" : ""}
+            {stockData?.d || 0}
+          </span>
+          <span>{`(${stockData?.dp || 0.0}%)`}</span>
+        </div>
       </div>
     </div>
   );
