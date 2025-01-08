@@ -103,7 +103,7 @@ const StockTable = ({
           <div className="mt-10 text-xl font-medium">Stocks not found</div>
         )}
       </div>
-      <div className="w-full hidden flex-col my-5 max-[600px]:flex gap-5">
+      <div className="w-full hidden flex-col my-5 max-[600px]:flex gap-5 pb-10">
         {isValidArray(stocksData) ? (
           stocksData.map((stock, index) => (
             <StockSlot
@@ -157,7 +157,7 @@ const StockSlot = (stockProp: StockSlotType) => {
         className={`w-full flex justify-between ${stockProp.classes}`}
       >
         <div className="flex flex-col gap-1 text-left max-w-[40%]">
-          <Tooltip title={`${stockProp.stockName} (${stockProp.ticker})`} >
+          <Tooltip title={`${stockProp.stockName} (${stockProp.ticker})`}>
             <p className="text-lg truncate">{stockProp.stockName}</p>
           </Tooltip>
           <p className="font-normal text-sm">
@@ -217,13 +217,21 @@ const PopUpMenu = ({
     >
       <Button
         style={{ fontWeight: "600" }}
-        onClick={() => handleOpenFormModal()}
+        onClick={() => {
+          {
+            handleOpenFormModal();
+            handleClose();
+          }
+        }}
       >
         Edit
       </Button>
       <Button
         style={{ color: "red", fontWeight: "600" }}
-        onClick={handleOpenDeleteModal}
+        onClick={() => {
+          handleOpenDeleteModal();
+          handleClose();
+        }}
       >
         Delete
       </Button>

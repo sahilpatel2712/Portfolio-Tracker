@@ -97,7 +97,7 @@ export const signinController = async (req: Request, res: Response) => {
       where: { email: body.email },
     });
     if (!user) {
-      res.status(404).json({ message: "Invalid email or password" });
+      res.status(404).json({ message: "User does not exist" });
       return;
     }
     const isPasswordValid = await bcrypt.compare(body.password, user.password);

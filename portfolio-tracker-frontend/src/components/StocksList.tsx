@@ -102,7 +102,7 @@ const StocksList = () => {
           }}
         />
       </div>
-      <div className="w-full overflow-y-auto ">
+      <div className="w-full overflow-y-auto pb-10">
         {isValidArray(stocksList) ? (
           stocksList.map((stock, index) => (
             <Stock

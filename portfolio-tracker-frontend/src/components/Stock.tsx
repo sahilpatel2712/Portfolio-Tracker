@@ -29,6 +29,8 @@ const Stock = ({ onClick, stock }: IndicatorValueType) => {
     });
     if (response && isValidObject(response.data.payload.stockData)) {
       setStockData(response.data.payload.stockData);
+    } else {
+      setStockData(undefined);
     }
   };
 

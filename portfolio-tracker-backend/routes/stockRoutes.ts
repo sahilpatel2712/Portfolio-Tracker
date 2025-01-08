@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   addStocks,
   deleteStocks,
-  getStocks,
+  getPortfolio,
   searchStocks,
   updateStocks,
   getStockData
@@ -11,7 +11,7 @@ import {
 const stockRouter = Router();
 
 stockRouter.get("/data", getStockData);
-stockRouter.get("/portfolio", getStocks);
+stockRouter.get("/portfolio", getPortfolio);
 stockRouter.get("/search", searchStocks);
 stockRouter.post("/add", addStocks);
 stockRouter.put("/update/:id", updateStocks);

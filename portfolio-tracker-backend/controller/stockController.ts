@@ -24,7 +24,7 @@ export const getStockData = async (req: Request, res: Response) => {
       const stockData = await searchStockData(
         (query?.ticker as string) || "",
       );
-      res.status(201).json({
+      res.status(200).json({
         message: "",
         payload: { stockData: stockData || {} },
       });
@@ -49,7 +49,7 @@ export const searchStocks = async (req: Request, res: Response) => {
     } else {
       response = await searchFinnhubSocks((query.q as string) || "", "US");
     }
-    res.status(201).json({
+    res.status(200).json({
       message: "",
       payload: { searchedStocks: response.data.result || [] },
     });
@@ -59,7 +59,7 @@ export const searchStocks = async (req: Request, res: Response) => {
   }
 };
 
-export const getStocks = async (req: Request, res: Response) => {
+export const getPortfolio = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
@@ -81,7 +81,7 @@ export const getStocks = async (req: Request, res: Response) => {
     const stocksData = await Promise.all(
       userStocks.map(async (stock) => await calculateStocksProfit(stock))
     );
-    res.status(201).json({
+    res.status(200).json({
       message: "Portfolio fetch successfully",
       payload: {
         stocksData: stocksData,
