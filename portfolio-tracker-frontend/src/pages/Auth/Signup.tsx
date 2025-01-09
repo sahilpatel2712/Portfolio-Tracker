@@ -81,7 +81,7 @@ const Signup = () => {
           Already a Member?
           <a href="/signin">
             <span className="font-semibold text-blue-700 cursor-pointer">
-              Signin
+              {" "}Signin
             </span>
           </a>
         </p>
