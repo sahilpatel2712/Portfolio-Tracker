@@ -1,10 +1,11 @@
 import { Button, Menu, Tooltip } from "@mui/material";
 import React from "react";
-import { EditIcon, TrashIcon } from "../assets/svgs";
+import { ChartIcon, EditIcon, TrashIcon } from "../assets/svgs";
 import DeleteConformModal from "./DeleteConformModal";
 import { isValidArray } from "../utils/objectsValidation";
 import { formatAmount, numberToCurrency } from "../utils/stocksUtils";
 import { FormValueType } from "../pages/Non-Auth/Portfolio";
+import { useNavigate } from "react-router";
 
 export type StockDataType = {
   id: string;
@@ -23,6 +24,7 @@ type PopUpMenuProps = {
   open: boolean;
   handleClose: () => void;
   handleOpenFormModal: () => void;
+  navigateChart: () => void;
 } & Pick<StockSlotType, "handleOpenDeleteModal">;
 type StockTableType = {
   stocksData: StockDataType[];
@@ -142,7 +144,7 @@ export default StockTable;
 const StockSlot = (stockProp: StockSlotType) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  const navigate = useNavigate();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -189,6 +191,7 @@ const StockSlot = (stockProp: StockSlotType) => {
         handleOpenFormModal={stockProp.handleOpenFormModal}
         anchorEl={anchorEl}
         handleOpenDeleteModal={stockProp.handleOpenDeleteModal}
+        navigateChart={() => navigate(`/chart`,{state:{ticker:stockProp.ticker,name:stockProp.stockName}})}
       />
     </>
   );
@@ -200,6 +203,7 @@ const PopUpMenu = ({
   handleClose,
   handleOpenFormModal,
   handleOpenDeleteModal,
+  navigateChart,
 }: PopUpMenuProps) =>
   anchorEl && (
     <Menu
@@ -210,7 +214,7 @@ const PopUpMenu = ({
       anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
       MenuListProps={{
         "aria-labelledby": "basic-button",
-        style: { display: "flex", padding: 0 },
+        style: { display: "flex", padding: 0, justifyContent: "space-between" },
       }}
       className="lg:hidden"
       disablePortal
@@ -224,8 +228,16 @@ const PopUpMenu = ({
           }
         }}
       >
-        Edit
+        <Tooltip title="Edit">{EditIcon()}</Tooltip>
       </Button>
+      <Tooltip title="Chart">
+        <Button
+          className="cursor-pointer flex justify-center items-center"
+          onClick={navigateChart}
+        >
+          <span>{ChartIcon()}</span>
+        </Button>
+      </Tooltip>
       <Button
         style={{ color: "red", fontWeight: "600" }}
         onClick={() => {
@@ -233,7 +245,7 @@ const PopUpMenu = ({
           handleClose();
         }}
       >
-        Delete
+        <Tooltip title="Delete">{TrashIcon()}</Tooltip>
       </Button>
     </Menu>
   );
@@ -241,7 +253,7 @@ const PopUpMenu = ({
 const TableCP = (stockProp: StockSlotType) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
+  const navigate = useNavigate();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget || null);
   };
@@ -249,11 +261,14 @@ const TableCP = (stockProp: StockSlotType) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const navigateChart = () => {
+    navigate(`/chart`,{state:{ticker:stockProp.ticker,name:stockProp.stockName}});
+  };
   return (
     <>
       <button
         onClick={handleClick}
-        className="flex w-full font-medium py-2 hover:bg-slate-700 cursor-pointer hover:bg-opacity-40"
+        className="flex w-full font-medium py-2 ps-2 hover:bg-slate-700 lg:cursor-default cursor-pointer hover:bg-opacity-40"
       >
         <Tooltip title={`${stockProp.stockName} (${stockProp.ticker})`}>
           <div className="flex-1 max-w-[50%] truncate">
@@ -276,10 +291,21 @@ const TableCP = (stockProp: StockSlotType) => {
           {formatAmount(stockProp.overall)}
         </div>
         <div className="flex-1 hidden lg:flex justify-evenly items-center ">
-          <div onClick={() => stockProp.handleOpenFormModal()}>
+          <div className="cursor-pointer" onClick={navigateChart}>
+            {ChartIcon()}
+          </div>
+          <div
+            className="cursor-pointer"
+            onClick={() => stockProp.handleOpenFormModal()}
+          >
             {EditIcon()}
           </div>
-          <div onClick={stockProp.handleOpenDeleteModal}>{TrashIcon()}</div>
+          <div
+            className="cursor-pointer"
+            onClick={stockProp.handleOpenDeleteModal}
+          >
+            {TrashIcon()}
+          </div>
         </div>
       </button>
       <PopUpMenu
@@ -288,6 +314,7 @@ const TableCP = (stockProp: StockSlotType) => {
         handleOpenFormModal={stockProp.handleOpenFormModal}
         anchorEl={anchorEl}
         handleOpenDeleteModal={stockProp.handleOpenDeleteModal}
+        navigateChart={navigateChart}
       />
     </>
   );

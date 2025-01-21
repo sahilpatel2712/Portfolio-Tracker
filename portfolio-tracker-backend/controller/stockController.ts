@@ -10,6 +10,7 @@ import {
   calculateStocksProfit,
   investedAmountCal,
   searchStockData,
+  stocksDataSeries,
 } from "../helper/stockHelper";
 import { searchFinnhubSocks } from "../helper/finnhubApiService";
 
@@ -21,9 +22,7 @@ export const getStockData = async (req: Request, res: Response) => {
   const query = req.query;
   try {
     if (query.ticker) {
-      const stockData = await searchStockData(
-        (query?.ticker as string) || "",
-      );
+      const stockData = await searchStockData((query?.ticker as string) || "");
       res.status(200).json({
         message: "",
         payload: { stockData: stockData || {} },
@@ -36,6 +35,30 @@ export const getStockData = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const stockChart = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return
+  }
+  const query = req.query;
+  try {
+    if (query?.ticker) {
+      const dataSeries = await stocksDataSeries(
+        (query?.seriesType as string) || 0,
+        query.ticker as string
+      );
+      res.status(200).json({ message: "", payload: dataSeries });
+      return
+    }
+    res.status(400).json({ message: "Doesn't provide Ticker" });
+  } catch (error) {
+    console.log("error in get stock series", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const searchStocks = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {

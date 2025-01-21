@@ -1,7 +1,7 @@
 import prisma from "../db";
 import { StockValueType } from "./zodSchema";
 import { stocksArray } from "./stockArray";
-import { finnhubApiService } from "./finnhubApiService";
+import { finnhubApiService, stocksDataArray } from "./finnhubApiService";
 
 export const addManyStocks = async (
   stocksData: StockValueType[],
@@ -102,5 +102,63 @@ export const searchStockData = async (ticker: string) => {
     return processedStocks;
   } catch (error) {
     console.error(`Error fetching data for ${ticker}:`, error);
+  }
+};
+const formatStockSeries = (
+  timeSeries: Record<string, Record<string, string>>,
+  limit: number
+) => {
+  if (!timeSeries) {
+    return {};
+  }
+  const dates: string[] = [];
+  const closingPrices: number[] = [];
+  const currentDate = Object.keys(timeSeries)[0];
+  const currentData = timeSeries[currentDate];
+
+  Object.entries(timeSeries)
+    .slice(0, limit)
+    .forEach(([date, values]) => {
+      dates.push(date);
+      closingPrices.push(parseFloat(values["4. close"]));
+    });
+
+  const formattedData = {
+    dates: dates.reverse(),
+    closingPrices: closingPrices.reverse(),
+    current: {
+      open: parseFloat(currentData["1. open"]),
+      high: parseFloat(currentData["2. high"]),
+      low: parseFloat(currentData["3. low"]),
+      close: parseFloat(currentData["4. close"]),
+    },
+    isPositive:
+      Number(closingPrices[0]) -
+        Number(closingPrices[closingPrices.length - 1]) <
+      0,
+  };
+  return formattedData;
+};
+export const stocksDataSeries = async (
+  TimeSeriesType: string | number,
+  symbol: string
+) => {
+  try {
+    if (Number(TimeSeriesType) === 2) {
+      const response = await stocksDataArray("TIME_SERIES_MONTHLY", symbol);
+
+      return formatStockSeries(
+        response.data["Monthly Time Series"] || null,
+        12
+      );
+    } else if (Number(TimeSeriesType) == 1) {
+      const response = await stocksDataArray("TIME_SERIES_WEEKLY", symbol);
+      return formatStockSeries(response.data["Weekly Time Series"] || null, 5);
+    } else {
+      const response = await stocksDataArray("TIME_SERIES_DAILY", symbol);
+      return formatStockSeries(response.data["Time Series (Daily)"] || null, 7);
+    }
+  } catch (error) {
+    throw error;
   }
 };

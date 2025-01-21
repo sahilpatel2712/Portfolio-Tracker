@@ -13,3 +13,9 @@ export const searchFinnhubSocks = async (query: string, exchange: string) => {
   );
   return response;
 };
+export const stocksDataArray = async (TimeSeries: string, symbol: string) => {
+  const response = await axios.get(
+    `https://www.alphavantage.co/query?function=${TimeSeries}&symbol=${symbol}&apikey=${process.env.ALPHA_TOKEN}`
+  );
+  return response;
+};

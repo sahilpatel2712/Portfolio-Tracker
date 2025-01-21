@@ -5,12 +5,14 @@ import {
   getPortfolio,
   searchStocks,
   updateStocks,
-  getStockData
+  getStockData,
+  stockChart
 } from "../controller/stockController";
 
 const stockRouter = Router();
 
 stockRouter.get("/data", getStockData);
+stockRouter.get("/chart", stockChart);
 stockRouter.get("/portfolio", getPortfolio);
 stockRouter.get("/search", searchStocks);
 stockRouter.post("/add", addStocks);

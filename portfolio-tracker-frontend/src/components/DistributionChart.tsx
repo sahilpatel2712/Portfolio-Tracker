@@ -32,7 +32,7 @@ const DistributionChart = () => {
                   (Number(item.value) * 100) /
                   Number(portfolioData.portfolioSummary.totalInvestment)
                 ).toFixed(2)}%`,
-              arcLabelMinAngle: 35,
+              arcLabelMinAngle: 40,
               cx: 150,
             },
           ]}

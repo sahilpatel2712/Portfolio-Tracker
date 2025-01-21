@@ -57,3 +57,36 @@ export const getStockData = async (
   }
   return null;
 };
+
+export const getStockSeries = async (
+  ticker: string,
+  seriesType: number,
+  navigation: (path: string) => void
+) => {
+  try {
+    const token = localStorage.getItem("userAuthToken");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_SERVER_URL}api/v1/stock/chart`,
+      {
+        params: {
+          ticker: ticker,
+          seriesType: seriesType,
+        },
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      errorToast(error.response?.data?.message || error?.message);
+      const statusCode = error.response?.status;
+      if (statusCode === 401) {
+        localStorage.removeItem("userAuthToken");
+        navigation("/signin");
+      }
+      return null;
+    }
+  }
+};
