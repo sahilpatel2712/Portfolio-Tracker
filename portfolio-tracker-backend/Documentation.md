@@ -113,6 +113,57 @@
     }
     ```
 
+- **Retrieve chart data of stock**
+
+  - **Endpoint**: `GET api/v1/stock/chart?&ticker=AAPL&seriesType=0`
+    - **Query Parameters** :
+      - `ticker`: Stock ticker symbol.
+      - `seriesType`: Integers
+        - `0`: For last week 
+        - `1`: For last month
+        - `2`: For last year
+
+  - **Request header**:
+
+    ```json
+    {
+      "authorization": "Bearer Token"
+    }
+    ```
+
+  - **Response**:
+
+    - **200 OK**: Returns portfolio data.
+    - **401 Unauthorized**: Authentication required.
+
+  - **Response Body**:
+
+    ```json
+    {
+      "payload": {
+        "closingPrices": [
+          234.4, 233.28, 237.87, 228.26, 229.98, 222.64, 223.83
+        ],
+        "current": {
+          "open": 219.79,
+          "high": 224.12,
+          "low": 219.79,
+          "close": 223.83
+        },
+        "dates": [
+          "2025-01-13",
+          "2025-01-14",
+          "2025-01-15",
+          "2025-01-16",
+          "2025-01-17",
+          "2025-01-21",
+          "2025-01-22"
+        ],
+        "isPositive": false
+      }
+    }
+    ```
+
 - **Get user portfolio**
 
   - **Endpoint**: `GET api/v1/stock/portfolio`

@@ -93,9 +93,21 @@ export const addStock = (
       );
       if (isValidObject(response.data.payload.stockData)) {
         const stocksData = getState().portfolio.stocksData;
-        const newStocksData = [...stocksData, response.data.payload.stockData];
+        let isInclude = false;
+        let newStocksData=[];
+        newStocksData = stocksData.map((stock) => {
+          if (stock.id === response.data.payload.stockData?.id) {
+            isInclude = true;
+            return response.data.payload.stockData;
+          } else {
+            return stock;
+          }
+        });
+        if (!isInclude) {
+          newStocksData = [...stocksData, response.data.payload.stockData];
+        }
 
-        const portfolioSummary = findPortfolioSummary(newStocksData);
+        const portfolioSummary = findPortfolioSummary(newStocksData || []);
         dispatch(
           setPortfolio({
             stocksData: newStocksData,
