@@ -60,10 +60,12 @@ Create a `.env` file in the `portfolio-tracker-backend` directory and add the fo
 DATABASE_URL="<Your MySQL Database Connection URL>"
 JWT_SECRET="<Your Secret Key>"
 FINNHUB_TOKEN="<Your Finnhub API Token>"
+ALPHA_TOKEN="<Your Alphavantage API Token>"
 ```
 
 - Use **[Aiven](https://aiven.io/)** for hosting your MySQL database.
 - Obtain your **[Finnhub API Token](https://finnhub.io/)**.
+- Obtain your **[Alphavantage API Token](https://www.alphavantage.co/support/#api-key)**.
 
 #### d. Migrate the Database Schema:
 
